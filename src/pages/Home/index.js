@@ -5,16 +5,25 @@ import {
   TextInput as TextInputRN,
   TouchableOpacity,
   ImageBackground,
+  Dimensions,
+  Modal,
 } from 'react-native';
 import React, {useState} from 'react';
 import styles from './styles';
-import {IcCamera, IcSearch, Logo} from '../../assets';
+import {IcCamera, IcClose, IcSearch, IcSuccess, Logo} from '../../assets';
 import {Button, Gap, TextInput} from '../../components';
 import {launchCamera} from 'react-native-image-picker';
+const SCREEN_WIDTH = Dimensions.get('window').width;
 import RNFS from 'react-native-fs';
+import {useDispatch} from 'react-redux';
+import {setLoading} from '../../redux/action';
 
 const Home = ({navigation}) => {
   const [imageCamera, setImageCamera] = useState(null);
+  const [modal, setModal] = useState(false);
+  const [toast, setToast] = useState(false);
+
+  const dispatch = useDispatch();
 
   const deleteFile = async () => {
     setImageCamera(null);
@@ -30,6 +39,10 @@ const Home = ({navigation}) => {
 
   const locationSearch = () => {
     navigation.navigate('LocationScreen');
+  };
+
+  const carsSearch = () => {
+    navigation.navigate('CarsPage');
   };
 
   const openCamera = () => {
@@ -59,16 +72,95 @@ const Home = ({navigation}) => {
     });
   };
 
+  const onSubmit = () => {
+    setModal(true);
+  };
+
   return (
     <ScrollView style={styles.page}>
+      {/* Toast Success */}
+      <Modal transparent visible={toast} animationType="slide">
+        <View style={styles.toastModal}>
+          <TouchableOpacity
+            activeOpacity={0.4}
+            onPress={() => {
+              setToast(false);
+            }}>
+            <View style={styles.toastModalClose}>
+              <IcClose />
+            </View>
+          </TouchableOpacity>
+          <View style={styles.toastModalBody}>
+            <IcSuccess />
+            <View style={styles.toastModalContent}>
+              <Text style={styles.toastContentTitle}>Success</Text>
+              <Text style={styles.toastContentSubtitle}>
+                This form success to submit and the form will be sent to the
+                admin dashboard
+              </Text>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      {/* Modal Confirm */}
+      <Modal
+        transparent
+        visible={modal}
+        animationType={'fade'}
+        onRequestClose={() => setModal(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalPop}>
+            <Text style={styles.modalText}>
+              Have you correctly filled out this form?
+            </Text>
+            <View style={styles.footerModal}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => {
+                  setModal(false);
+                }}>
+                <View
+                  style={{
+                    ...styles.buttonModal,
+                    borderEndWidth: 0.5,
+                    borderEndColor: '#C2C2C2',
+                  }}>
+                  <Text style={styles.buttonModalText}>Cancel</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => {
+                  setModal(false);
+                  dispatch(setLoading(true));
+                  setTimeout(() => {
+                    dispatch(setLoading(false));
+                    setToast(true);
+                    setTimeout(() => {
+                      setToast(false);
+                    }, 3000);
+                  }, 5000);
+                }}>
+                <View style={styles.buttonModal}>
+                  <Text style={styles.buttonModalText}>Submit</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.header}>
         <View style={styles.logoContainer}>
           <Logo />
           <Text style={styles.logoName}>GA Odometer</Text>
         </View>
-        <View style={styles.userProfile}>
-          <Text style={styles.userProfileName}>B</Text>
-        </View>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('ProfileScreen')}>
+          <View style={styles.userProfile}>
+            <Text style={styles.userProfileName}>B</Text>
+          </View>
+        </TouchableOpacity>
       </View>
       <Gap height={32} />
       <View style={styles.headerTitle}>
@@ -76,6 +168,7 @@ const Home = ({navigation}) => {
         <Text style={styles.welcomeSubtitle}>Please fill this form</Text>
       </View>
       <Gap height={32} />
+      {/* Input Camera */}
       <Text style={styles.titleMargin}>Upload camera *</Text>
       <View style={styles.headerPadding}>
         {imageCamera !== null ? (
@@ -105,28 +198,33 @@ const Home = ({navigation}) => {
         )}
       </View>
       <Gap height={16} />
+      {/* Input Odometer */}
       <View style={styles.paddingOnly}>
         <TextInput
           label={'Odometer *'}
           placeholder={'Km...'}
           placeholderTextColor="#C2C2C2"
+          keyboardType="numeric"
         />
       </View>
       <Gap height={16} />
+      {/* Input Location */}
       <View style={styles.paddingOnly}>
         <View>
           <TextInput
             label={'Location Name *'}
             placeholder={'PT/SPBU/...'}
             placeholderTextColor="#C2C2C2"
+            onPressIn={locationSearch}
+            blurOnSubmit={false}
             icon={
               <TouchableOpacity activeOpacity={0.7} onPress={locationSearch}>
                 <IcSearch
                   style={{
-                    padding: 10,
                     position: 'absolute',
                     right: 10,
                     top: 0,
+                    padding: 10,
                   }}
                 />
               </TouchableOpacity>
@@ -135,19 +233,29 @@ const Home = ({navigation}) => {
         </View>
       </View>
       <Gap height={16} />
+      {/* Input Car */}
       <View style={styles.paddingOnly}>
         <TextInput
           label={'Car *'}
           placeholder={'Car'}
           placeholderTextColor="#C2C2C2"
+          onPressIn={carsSearch}
           icon={
-            <IcSearch
-              style={{padding: 10, position: 'absolute', right: 10, top: 30}}
-            />
+            <TouchableOpacity activeOpacity={0.7} onPress={carsSearch}>
+              <IcSearch
+                style={{
+                  position: 'absolute',
+                  right: 10,
+                  top: 0,
+                  padding: 10,
+                }}
+              />
+            </TouchableOpacity>
           }
         />
       </View>
       <Gap height={16} />
+      {/* Input Plat */}
       <View style={styles.paddingOnly}>
         <Text style={styles.platTitle}>Plat No</Text>
         <View style={styles.containerPlatNo}>
@@ -156,24 +264,30 @@ const Home = ({navigation}) => {
             placeholder={'B'}
             maxLength={2}
             placeholderTextColor="#C2C2C2"
+            editable={false}
+            value={''}
           />
           <TextInputRN
             style={styles.platTwo}
             placeholder={'1234'}
             placeholderTextColor="#C2C2C2"
             maxLength={6}
+            editable={false}
+            value={''}
           />
           <TextInputRN
             style={styles.platThree}
-            placeholder={'NYC'}
             placeholderTextColor="#C2C2C2"
+            placeholder={'NYC'}
             maxLength={3}
+            editable={false}
+            value={''}
           />
         </View>
       </View>
       <Gap height={24} />
       <View style={styles.paddingOnly}>
-        <Button text={'SUBMIT'} />
+        <Button text={'SUBMIT'} onPress={onSubmit} />
       </View>
       <Gap height={52} />
     </ScrollView>

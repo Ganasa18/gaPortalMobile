@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     borderColor: '#C2C2C2',
     backgroundColor: '#F3F3F3',
     paddingVertical: 8,
-    paddingHorizontal: 43,
+    paddingHorizontal: 40,
     marginRight: 47,
     textAlign: 'center',
   },
@@ -157,6 +157,83 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 13,
     textAlign: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#0000004C',
+  },
+  modalPop: {
+    paddingTop: 27,
+    paddingHorizontal: 14,
+    width: 242,
+    height: 120,
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+  },
+  modalText: {
+    fontSize: 14,
+    color: '#444444',
+
+    fontFamily: 'Roboto-Regular',
+  },
+  footerModal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonModal: {
+    paddingTop: 10,
+    marginTop: 20,
+    paddingBottom: 8,
+    paddingHorizontal: 38,
+    borderTopColor: '#C2C2C2',
+    borderTopWidth: 0.5,
+  },
+  buttonModalText: {
+    color: '#444444',
+    fontSize: 14,
+    fontFamily: 'Roboto-Bold',
+  },
+
+  toastModal: {
+    width: SCREEN_WIDTH,
+    height: 128,
+    backgroundColor: '#3CAE47',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+
+  toastModalClose: {
+    alignItems: 'flex-end',
+    marginTop: 8,
+    marginRight: 16,
+  },
+
+  toastModalBody: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+  },
+  toastModalContent: {
+    flexDirection: 'column',
+    width: 270,
+    marginLeft: 10,
+  },
+  toastContentTitle: {
+    fontSize: 16,
+    marginBottom: 12,
+    color: '#FFF',
+    fontFamily: 'Roboto-Medium',
+  },
+  toastContentSubtitle: {
+    fontSize: 14,
+    color: '#FFF',
+    fontFamily: 'Roboto-Regular',
+    lineHeight: 18,
   },
 });
 export default styles;

@@ -1,6 +1,6 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {Home, LocationScreen} from '../pages';
+import {CarsPage, Home, LocationScreen, ProfileScreen} from '../pages';
 
 const Stack = createStackNavigator();
 
@@ -15,6 +15,16 @@ const Router = () => {
       <Stack.Screen
         name="LocationScreen"
         component={LocationScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="CarsPage"
+        component={CarsPage}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="ProfileScreen"
+        component={ProfileScreen}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     borderColor: '#828282',
     padding: 8,
     width: '100%',
-    backgroundColor: '#F3F8FF',
+    backgroundColor: '#FFF',
     color: '#444444',
   },
 });

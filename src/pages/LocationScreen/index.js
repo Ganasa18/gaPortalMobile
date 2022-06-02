@@ -11,11 +11,17 @@ const {StatusBarManager} = NativeModules;
 
 // const SCREEN_WIDTH = Dimensions.get('window').width;
 const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBarManager.HEIGHT;
-import React from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {Gap, TextInput} from '../../components';
 import {IcBack, IcPt, IcSearch, IcSpbu} from '../../assets';
 
 const LocationScreen = ({navigation}) => {
+  const [input, setInput] = useState('');
+
+  const locationRef = useRef(null);
+
+  useEffect(() => {}, []);
+
   return (
     <View style={styles.page}>
       <View style={styles.containerSearch}>
@@ -29,6 +35,8 @@ const LocationScreen = ({navigation}) => {
         <TextInput
           placeholder={'PT/SPBU/...'}
           placeholderTextColor="#C2C2C2"
+          autoFocus={true}
+          // onChangeText={text => setInput(text)}
           icon={
             <IcSearch
               style={{padding: 10, position: 'absolute', right: 10, top: 30}}
@@ -125,7 +133,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 16,
   },
-  recentContainerText: {},
+
   title: {
     fontFamily: 'Roboto-Bold',
     fontSize: 14,

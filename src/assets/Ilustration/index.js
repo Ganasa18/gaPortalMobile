@@ -1,2 +1,3 @@
 import Logo from './Logo.svg';
-export {Logo};
+import dummyPhoto from './dummyPhoto.png';
+export {Logo, dummyPhoto};
