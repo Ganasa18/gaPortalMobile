@@ -31,7 +31,10 @@ const ProfileScreen = ({navigation}) => {
       <ItemValue label={'Plat NO'} value={'B4324BRT'} />
       <Gap height={32} />
       <View style={styles.paddingOnly}>
-        <Button text={'Log Out'} onPress={() => {}} />
+        <Button
+          text={'Log Out'}
+          onPress={() => navigation.replace('LoginScreen')}
+        />
       </View>
       <Gap height={32} />
     </ScrollView>

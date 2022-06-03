@@ -1,12 +1,30 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {CarsPage, Home, LocationScreen, ProfileScreen} from '../pages';
+import {
+  CarsPage,
+  Home,
+  HomeAdminScreen,
+  LocationScreen,
+  LoginScreen,
+  ProfileScreen,
+  SplashScreen,
+} from '../pages';
 
 const Stack = createStackNavigator();
 
 const Router = () => {
   return (
     <Stack.Navigator>
+      <Stack.Screen
+        name="SplashScreen"
+        component={SplashScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="LoginScreen"
+        component={LoginScreen}
+        options={{headerShown: false}}
+      />
       <Stack.Screen
         name="Home"
         component={Home}
@@ -25,6 +43,13 @@ const Router = () => {
       <Stack.Screen
         name="ProfileScreen"
         component={ProfileScreen}
+        options={{headerShown: false}}
+      />
+
+      {/* Admin Page */}
+      <Stack.Screen
+        name="HomeAdmin"
+        component={HomeAdminScreen}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

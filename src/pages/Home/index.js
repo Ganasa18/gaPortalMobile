@@ -75,6 +75,17 @@ const Home = ({navigation}) => {
   const onSubmit = () => {
     setModal(true);
   };
+  const submitForm = () => {
+    setModal(false);
+    dispatch(setLoading(true));
+    setTimeout(() => {
+      dispatch(setLoading(false));
+      setToast(true);
+      setTimeout(() => {
+        setToast(false);
+      }, 3000);
+    }, 5000);
+  };
 
   return (
     <ScrollView style={styles.page}>
@@ -128,19 +139,7 @@ const Home = ({navigation}) => {
                   <Text style={styles.buttonModalText}>Cancel</Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => {
-                  setModal(false);
-                  dispatch(setLoading(true));
-                  setTimeout(() => {
-                    dispatch(setLoading(false));
-                    setToast(true);
-                    setTimeout(() => {
-                      setToast(false);
-                    }, 3000);
-                  }, 5000);
-                }}>
+              <TouchableOpacity activeOpacity={0.7} onPress={submitForm}>
                 <View style={styles.buttonModal}>
                   <Text style={styles.buttonModalText}>Submit</Text>
                 </View>
@@ -197,6 +196,7 @@ const Home = ({navigation}) => {
           </>
         )}
       </View>
+      {/* <Text>You must take a picture from camera</Text> */}
       <Gap height={16} />
       {/* Input Odometer */}
       <View style={styles.paddingOnly}>
@@ -204,7 +204,7 @@ const Home = ({navigation}) => {
           label={'Odometer *'}
           placeholder={'Km...'}
           placeholderTextColor="#C2C2C2"
-          keyboardType="numeric"
+          keyboardType="phone-pad"
         />
       </View>
       <Gap height={16} />
