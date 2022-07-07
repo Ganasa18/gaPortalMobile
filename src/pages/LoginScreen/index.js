@@ -15,7 +15,7 @@ const LoginScreen = ({navigation}) => {
 
   const loginOption = () => {
     if (option === 'driver') {
-      navigation.replace('Home');
+      navigation.reset({index: 0, routes: [{name: 'MainApp'}]});
     } else {
       navigation.replace('HomeAdmin');
     }

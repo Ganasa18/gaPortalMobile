@@ -16,6 +16,26 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
   },
+
+  headerContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 24,
+  },
+  containerBack: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    padding: 5,
+  },
+
+  headerName: {
+    color: '#444444',
+    marginTop: 20,
+    marginLeft: 10,
+    fontFamily: 'Roboto-Bold',
+    fontSize: 16,
+  },
+
   logoContainer: {
     justifyContent: 'space-between',
     flexDirection: 'row',
@@ -175,7 +195,6 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 14,
     color: '#444444',
-
     fontFamily: 'Roboto-Regular',
   },
   footerModal: {

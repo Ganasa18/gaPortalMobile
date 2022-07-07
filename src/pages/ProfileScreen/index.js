@@ -8,13 +8,13 @@ const ProfileScreen = ({navigation}) => {
   return (
     <ScrollView style={styles.page}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => navigation.goBack()}>
           <View style={styles.containerBack}>
             <IcBack />
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Text style={styles.headerName}>Profile</Text>
       </View>
       <View style={styles.photo}>

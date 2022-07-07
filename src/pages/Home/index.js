@@ -10,8 +10,15 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import styles from './styles';
-import {IcCamera, IcClose, IcSearch, IcSuccess, Logo} from '../../assets';
-import {Button, Gap, TextInput} from '../../components';
+import {
+  IcBack,
+  IcCamera,
+  IcClose,
+  IcSearch,
+  IcSuccess,
+  Logo,
+} from '../../assets';
+import {Button, Gap, ProgressComponent, TextInput} from '../../components';
 import {launchCamera} from 'react-native-image-picker';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 import RNFS from 'react-native-fs';
@@ -148,24 +155,23 @@ const Home = ({navigation}) => {
           </View>
         </View>
       </Modal>
-      <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <Logo />
-          <Text style={styles.logoName}>GA Odometer</Text>
-        </View>
+      <View style={styles.headerContainer}>
         <TouchableOpacity
           activeOpacity={0.7}
-          onPress={() => navigation.navigate('ProfileScreen')}>
-          <View style={styles.userProfile}>
-            <Text style={styles.userProfileName}>B</Text>
+          onPress={() => navigation.goBack()}>
+          <View style={styles.containerBack}>
+            <IcBack />
           </View>
         </TouchableOpacity>
+        <Text style={styles.headerName}>Kilometer</Text>
       </View>
       <Gap height={32} />
-      <View style={styles.headerTitle}>
-        <Text style={styles.welcomeTitle}>Welcome, Bima Ramdhan</Text>
-        <Text style={styles.welcomeSubtitle}>Please fill this form</Text>
-      </View>
+      <ProgressComponent
+        step={1}
+        title={'Tempat Awal Berangkat'}
+        subtitle={'Next Tempat Akhir Perjalanan'}
+        border={0}
+      />
       <Gap height={32} />
       {/* Input Camera */}
       <Text style={styles.titleMargin}>Upload camera *</Text>
