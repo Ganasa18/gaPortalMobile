@@ -3,8 +3,9 @@ const initGlobalState = {
   isModalConfirm: false,
   isModalRemark: false,
   isModalMonth: false,
-  isEnabled: true,
+  isEnabled: false,
   isRemarkSelected: '',
+  isCountToday: 1,
 };
 
 export const globalReducer = (state = initGlobalState, action) => {
@@ -41,6 +42,12 @@ export const globalReducer = (state = initGlobalState, action) => {
       return {
         ...state,
         isModalMonth: action.value,
+      };
+    }
+    case 'SET_COUNT_TODAY': {
+      return {
+        ...state,
+        isCountToday: action.value,
       };
     }
     default:

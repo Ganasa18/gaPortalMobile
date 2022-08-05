@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
     lineHeight: 18,
+    maxWidth: 200,
   },
 
   subTitleWork: {

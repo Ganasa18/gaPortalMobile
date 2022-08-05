@@ -6,6 +6,7 @@ import {Provider} from 'react-redux';
 import {Loading} from './components';
 import {useSelector} from 'react-redux';
 import store from './redux';
+import FlashMessage from 'react-native-flash-message';
 
 const MainApp = () => {
   const {isLoading} = useSelector(state => state.globalReducer);
@@ -13,6 +14,7 @@ const MainApp = () => {
     <NavigationContainer>
       <StatusBar barStyle={'light-content'} />
       <Router />
+      <FlashMessage position="top" />
       {/* <Loading /> */}
       {isLoading && <Loading />}
     </NavigationContainer>

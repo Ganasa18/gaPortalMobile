@@ -12,16 +12,111 @@ const {StatusBarManager} = NativeModules;
 // const SCREEN_WIDTH = Dimensions.get('window').width;
 const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBarManager.HEIGHT;
 import React, {useState, useEffect, useRef} from 'react';
-import {Gap, TextInput} from '../../components';
-import {IcBack, IcPt, IcSearch, IcSpbu} from '../../assets';
+import {Button, Gap, TextInput} from '../../components';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  IcBack,
+  IcSearch,
+  IcKonsumen,
+  IcRumah,
+  IcStop,
+  IcKantor,
+  IcSearchLocation,
+} from '../../assets';
 
 const LocationScreen = ({navigation}) => {
   const [input, setInput] = useState('');
-
   const locationRef = useRef(null);
+  const {locationReducer} = useSelector(state => state);
+  const selectedCategory = locationReducer.formCategorySelect;
+  const selectedId = locationReducer.formIdSelect;
+  const formInput = locationReducer.formLocation;
+
+  const customer = [
+    {
+      id: 1,
+      customer_name: 'Jaya Jaya',
+      customer_name_fix: 'PT Jaya Makmur',
+    },
+    {
+      id: 2,
+      customer_name: 'Raya',
+      customer_name_fix: 'PT Raya Makmur',
+    },
+    {
+      id: 1,
+      customer_name: 'Indofood',
+      customer_name_fix: 'PT Indofood',
+    },
+  ];
+
+  const [customerList, setCustomerList] = useState(customer);
+
+  const dispatch = useDispatch();
+
+  const Icon = ({label, focus}) => {
+    switch (label) {
+      case 'konsumen':
+        return <IcKonsumen />;
+      case 'tempat berhenti':
+        return <IcStop />;
+      case 'kantor':
+        return <IcKantor />;
+      case 'rumah':
+        return <IcRumah />;
+      default:
+        return <IcKonsumen />;
+    }
+  };
 
   useEffect(() => {}, []);
 
+  const handleSelectedLocation = value => {
+    const _inputs = [...formInput];
+    let myArray = _inputs;
+    let objIndex = myArray.findIndex(obj => obj.key === selectedId);
+
+    myArray[objIndex].location = value;
+
+    [
+      ...myArray.slice(0, objIndex),
+      Object.assign({}, myArray[objIndex], ...myArray.slice(objIndex + 1)),
+    ];
+    dispatch({type: 'SET_FORM_LOCATION', value: myArray});
+    navigation.reset({index: 0, routes: [{name: 'Kilometer3'}]});
+  };
+
+  const handleSelectedLocationSubmit = () => {
+    const _inputs = [...formInput];
+    let myArray = _inputs;
+    let objIndex = myArray.findIndex(obj => obj.key === selectedId);
+    myArray[objIndex].location = input;
+    [
+      ...myArray.slice(0, objIndex),
+      Object.assign({}, myArray[objIndex], ...myArray.slice(objIndex + 1)),
+    ];
+    dispatch({type: 'SET_FORM_LOCATION', value: myArray});
+    navigation.reset({index: 0, routes: [{name: 'Kilometer3'}]});
+  };
+
+  const filterByValue = (array, value) => {
+    return array.filter(
+      data =>
+        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1,
+    );
+  };
+
+  const handleSearchArea = value => {
+    setInput(value);
+    setTimeout(() => {
+      if (value.length <= 0) {
+        setCustomerList(customer);
+        return;
+      }
+      let searchRequest = filterByValue(customer, value);
+      setCustomerList(searchRequest);
+    }, 3000);
+  };
   return (
     <View style={styles.page}>
       <View style={styles.containerSearch}>
@@ -36,7 +131,7 @@ const LocationScreen = ({navigation}) => {
           placeholder={'PT/SPBU/...'}
           placeholderTextColor="#C2C2C2"
           autoFocus={true}
-          // onChangeText={text => setInput(text)}
+          onChangeText={text => handleSearchArea(text)}
           icon={
             <IcSearch
               style={{padding: 10, position: 'absolute', right: 10, top: 30}}
@@ -47,45 +142,42 @@ const LocationScreen = ({navigation}) => {
       <Gap height={16} />
       <View style={styles.divider} />
       <Gap height={24} />
+
       <View style={styles.paddingRecent}>
-        <Text style={styles.recentTitle}>Recent</Text>
-        <Gap height={14} />
-        <View style={styles.recentContainer}>
-          <IcPt />
-          <Gap width={22} />
-          <View style={styles.recentContainerText}>
-            <Text style={styles.title}>PT Jaya Jaya</Text>
-            <Gap height={8} />
-            <Text style={styles.subtitle}>
-              Jl Merdeka 2 no 30, Duren sawit, Jakarta Timur
-            </Text>
-            <Gap height={16} />
-          </View>
-        </View>
-        <View style={styles.recentContainer}>
-          <IcSpbu />
-          <Gap width={22} />
-          <View style={styles.recentContainerText}>
-            <Text style={styles.title}>SPBU Duren Sawit</Text>
-            <Gap height={8} />
-            <Text style={styles.subtitle}>
-              Jl Merdeka 2 no 30, Duren sawit, Jakarta Timur
-            </Text>
-            <Gap height={16} />
-          </View>
-        </View>
-        <View style={styles.recentContainer}>
-          <IcPt />
-          <Gap width={22} />
-          <View style={styles.recentContainerText}>
-            <Text style={styles.title}>MasterCard</Text>
-            <Gap height={8} />
-            <Text style={styles.subtitle}>
-              8502 Preston Rd. Inglewood, Maine 98380
-            </Text>
-            <Gap height={16} />
-          </View>
-        </View>
+        {customerList.length > 0 ? (
+          customerList.map((item, index) => (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              key={index}
+              style={styles.recentContainer}
+              onPress={() => handleSelectedLocation(item.customer_name_fix)}>
+              <Icon label={selectedCategory} />
+              <Gap width={22} />
+              <View style={styles.recentContainerText}>
+                <Text style={styles.title}>{item.customer_name}</Text>
+                <Gap height={8} />
+                <Text style={styles.subtitle}>{item.customer_name_fix}</Text>
+                <Gap height={16} />
+              </View>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <>
+            <Gap height={80} />
+            <View style={styles.searchContainer}>
+              <View style={styles.searchIconContainer}>
+                <IcSearchLocation />
+              </View>
+              <Gap height={16} />
+              <Text>Search not found</Text>
+              <Gap height={16} />
+              <Button
+                text="Keeping add location"
+                onPress={handleSelectedLocationSubmit}
+              />
+            </View>
+          </>
+        )}
       </View>
     </View>
   );
@@ -145,5 +237,20 @@ const styles = StyleSheet.create({
     color: '#444444',
     maxWidth: 250,
     lineHeight: 20,
+  },
+
+  searchContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  searchIconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 100,
+    backgroundColor: '#C2C2C2',
+    paddingHorizontal: 13,
+    paddingVertical: 13,
   },
 });

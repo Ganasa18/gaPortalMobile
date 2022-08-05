@@ -3,8 +3,14 @@ import React from 'react';
 import styles from './styles';
 import {dummyPhoto, IcBack} from '../../assets';
 import {Button, Gap, ItemValue} from '../../components';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const ProfileScreen = ({navigation}) => {
+  const signOut = () => {
+    AsyncStorage.multiRemove(['token', 'reminder', 'userData']).then(() => {
+      navigation.reset({index: 0, routes: [{name: 'LoginScreen'}]});
+    });
+  };
+
   return (
     <ScrollView style={styles.page}>
       <View style={styles.headerContainer}>
@@ -31,10 +37,7 @@ const ProfileScreen = ({navigation}) => {
       <ItemValue label={'Plat NO'} value={'B4324BRT'} />
       <Gap height={32} />
       <View style={styles.paddingOnly}>
-        <Button
-          text={'Log Out'}
-          onPress={() => navigation.replace('LoginScreen')}
-        />
+        <Button text={'Log Out'} onPress={signOut} />
       </View>
       <Gap height={32} />
     </ScrollView>

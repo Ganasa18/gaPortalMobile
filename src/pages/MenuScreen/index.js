@@ -1,5 +1,5 @@
 import styles from './styles';
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {View, Text, ScrollView, TouchableOpacity, Modal} from 'react-native';
 import {
@@ -23,17 +23,32 @@ import Switch from 'react-native-switch-toggles-2';
 import {RadioButton} from 'react-native-radio-buttons-group';
 import MonthPicker from 'react-native-month-year-picker-inf';
 import moment from 'moment';
+import PushNotification, {Importance} from 'react-native-push-notification';
+import {getData, storeData} from '../../utils/LocalStore';
+import {
+  checkStatusUser,
+  checkTodayReport,
+  setLoading,
+} from '../../redux/action';
+import {capitalizeFirstLetter} from '../../utils';
 
 const MenuScreen = ({navigation}) => {
   const dispatch = useDispatch();
   // const [isEnabled, setIsEnabled] = useState(true);
   // const [modalRemark, setModalRemark] = useState(false);
   // const [radioSelect, setRadioSelect] = useState(null);
-  const {globalReducer} = useSelector(state => state);
+  const {globalReducer, userReducer, reportReducer} = useSelector(
+    state => state,
+  );
   const radioSelect = globalReducer.isRemarkSelected;
+  const userOffline = userReducer.userOffline;
   const isEnabled = globalReducer.isEnabled;
   const modalRemark = globalReducer.isModalRemark;
   const modalMonth = globalReducer.isModalMonth;
+  const countToday = globalReducer.isCountToday;
+  const userData = userReducer.userData;
+
+  // const countToday = 3;
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const showPicker = useCallback(value => setShow(value), []);
@@ -56,12 +71,16 @@ const MenuScreen = ({navigation}) => {
       dispatch({type: 'SET_IS_ENABLED', value: false});
       return;
     }
+    //  else {
+    //   dispatch({type: 'SET_MODAL_REMARK', value: false});
+    // }
     // dispatch({type: 'SET_IS_ENABLED', value: true});
   };
 
   const bodyRemark = (
     <>
       <RadioButton
+        labelStyle={{color: '#444444'}}
         label="Izin"
         value={'izin'}
         selected={radioSelect === 'izin' ? true : false}
@@ -69,6 +88,7 @@ const MenuScreen = ({navigation}) => {
       />
       <Gap height={10} />
       <RadioButton
+        labelStyle={{color: '#444444'}}
         label="Sakit"
         value={'sakit'}
         selected={radioSelect === 'sakit' ? true : false}
@@ -76,6 +96,7 @@ const MenuScreen = ({navigation}) => {
       />
       <Gap height={10} />
       <RadioButton
+        labelStyle={{color: '#444444'}}
         label="Tidak ada visit"
         value={'no visit'}
         selected={radioSelect === 'no visit' ? true : false}
@@ -91,13 +112,49 @@ const MenuScreen = ({navigation}) => {
     </>
   );
 
-  const bodyMonthSelect = (
-    <>
-      <View>
-        <MonthPicker onChange={onValueChange} value={date} />
-      </View>
-    </>
-  );
+  const createChannels = () => {
+    PushNotification.createChannel({
+      channelId: 'demo-channel', // (required)
+      channelName: 'Demo channel', // (required)
+      vibrate: true, // (optional)
+    });
+  };
+
+  const handleNotification = () => {
+    PushNotification.localNotificationSchedule({
+      channelId: 'demo-channel',
+      title: 'Berangkat 😍',
+      message:
+        'Jangan lupa untuk mengisi data terlebih dahulu sebelum anda berangkat ' +
+        new Date().toLocaleDateString(),
+      date: new Date(Date.now() + 1 * 1000),
+      repeatType: 'day',
+      repeatTime: 1, //Repeat every 100 days
+      importance: Importance.HIGH,
+    });
+  };
+
+  useEffect(() => {
+    // dispatch(setLoading(true));
+    getData('userData').then(res => {
+      dispatch({type: 'SET_USER_DATA', value: res.value});
+      dispatch(checkTodayReport(res.value.username));
+      // console.log(res.value.id);
+      // dispatch(checkStatusUser(res.value.id));
+    });
+    createChannels();
+    setTimeout(() => {
+      getData('reminder').then(res => {
+        if (res) {
+          console.log('reminder have setting before ', res);
+          // dispatch(setLoading(false));
+        } else {
+          handleNotification();
+          storeData('reminder', {value: true});
+        }
+      });
+    }, 2000);
+  }, []);
 
   return (
     <ScrollView style={styles.pages}>
@@ -106,11 +163,11 @@ const MenuScreen = ({navigation}) => {
         body={bodyRemark}
         title="Remark"
         onRequestClose={() => {
-          dispatch({type: 'SET_IS_ENABLED', value: true});
+          // dispatch({type: 'SET_IS_ENABLED', value: true});
           dispatch({type: 'SET_MODAL_REMARK', value: false});
         }}
         onPress={() => {
-          dispatch({type: 'SET_IS_ENABLED', value: true});
+          // dispatch({type: 'SET_IS_ENABLED', value: true});
           dispatch({type: 'SET_MODAL_REMARK', value: false});
         }}
         visible={modalRemark}
@@ -145,7 +202,9 @@ const MenuScreen = ({navigation}) => {
       <Gap height={32} />
       {/* Switch On/Off */}
       <View style={styles.headerContainer}>
-        <Text style={styles.welcomeTitle}>Welcome Eren Yeiger</Text>
+        <Text style={styles.welcomeTitle}>
+          Welcome {userData ? capitalizeFirstLetter(userData?.username) : null}
+        </Text>
         <Switch
           size={35}
           value={isEnabled}
@@ -217,29 +276,69 @@ const MenuScreen = ({navigation}) => {
       </View>
       <Gap height={32} />
       {/* Work Step */}
-      <ProgressComponent
-        step={1}
-        title={'Tempat Awal Berangkat'}
-        subtitle={'Next Tempat Akhir Perjalanan'}
-      />
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => {
+          if (countToday === 1) {
+            navigation.navigate('Kilometer');
+            return;
+          } else if (countToday === 2) {
+            navigation.navigate('Kilometer2');
+            return;
+          } else {
+            navigation.navigate('Kilometer3');
+          }
+        }}>
+        <ProgressComponent
+          step={countToday}
+          title={`${
+            countToday === 1
+              ? 'Tempat Awal Berangkat'
+              : countToday === 2
+              ? 'Tempat Akhir Perjalanan'
+              : 'Sudah kemana saja kamu hari ini?'
+          }`}
+          subtitle={`${
+            countToday === 1
+              ? 'Tempat Akhir Perjalanan'
+              : 'Next Kemana Saja Kamu Hari Ini'
+          }`}
+        />
+      </TouchableOpacity>
       <Gap height={28} />
       {/* Menu User */}
       <View style={styles.containerMenu}>
         <TouchableOpacity
           style={styles.cardMenu}
           activeOpacity={0.7}
-          onPress={() => navigation.navigate('Kilometer')}>
+          onPress={() => {
+            if (countToday === 1) {
+              navigation.navigate('Kilometer');
+              return;
+            } else if (countToday === 2) {
+              navigation.navigate('Kilometer2');
+              return;
+            } else {
+              navigation.navigate('Kilometer3');
+            }
+          }}>
           <OdoMenu />
           <Gap height={8} />
           <Text style={styles.menuTitle}>Kilometer</Text>
         </TouchableOpacity>
         <Gap width={74} />
-        <View style={styles.cardMenu}>
+        <TouchableOpacity
+          style={styles.cardMenu}
+          activeOpacity={0.7}
+          onPress={() => {
+            navigation.navigate('Emergency');
+          }}>
           <BellMenu />
           <Gap height={8} />
           <Text style={styles.menuTitle}>Emergency</Text>
-        </View>
+        </TouchableOpacity>
       </View>
+
       {/* <View>
         <RadioGroup
           radioButtons={radioButtons}

@@ -101,6 +101,18 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
 
+  containerCameraError: {
+    width: 312,
+    height: 120,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#E45959',
+    backgroundColor: '#F3F8FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+
   labelCameraName: {
     color: '#C2C2C2',
     fontFamily: 'Roboto-Regular',
@@ -139,6 +151,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
 
+  errorText: {
+    color: '#E45959',
+    fontFamily: 'Roboto-Regular',
+    fontSize: 14,
+    lineHeight: 16,
+  },
+
   containerPlatNo: {
     flex: 1,
     flexDirection: 'row',
@@ -158,6 +177,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     marginRight: 47,
     textAlign: 'center',
+    color: '#444',
   },
   platTwo: {
     borderWidth: 1,
@@ -168,6 +188,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     marginRight: 47,
     textAlign: 'center',
+    color: '#444',
   },
   platThree: {
     borderWidth: 1,
@@ -177,6 +198,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 13,
     textAlign: 'center',
+    color: '#444',
   },
   modalContainer: {
     flex: 1,

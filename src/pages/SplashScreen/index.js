@@ -1,15 +1,35 @@
 import LottieView from 'lottie-react-native';
 import React, {useEffect, useRef} from 'react';
 import {NativeModules, Platform, StyleSheet, Text, View} from 'react-native';
+import {getData} from '../../utils/LocalStore';
 const {StatusBarManager} = NativeModules;
 const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBarManager.HEIGHT;
+import {useDispatch, useSelector} from 'react-redux';
+import {checkTodayKm} from '../../redux/action';
 
 const SplashScreen = ({navigation}) => {
   const animation = useRef(null);
+  const dispatch = useDispatch();
   useEffect(() => {
     animation.current.play();
     setTimeout(() => {
-      navigation.replace('LoginScreen');
+      getData('token').then(res => {
+        if (res) {
+          // navigation.replace('LoginScreen');
+          navigation.reset({index: 0, routes: [{name: 'MainApp'}]});
+
+          getData('userData').then(res => {
+            dispatch(checkTodayKm(res.value.username));
+          });
+        } else {
+          getData('userData').then(res => {
+            navigation.replace('LoginScreen');
+            // console.log(res.value.id);
+            dispatch(checkTodayKm(res.value.username));
+            dispatch(checkStatusUser(res.value.id));
+          });
+        }
+      });
     }, 3000);
   }, []);
   return (

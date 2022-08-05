@@ -7,15 +7,26 @@ import {
 } from 'react-native';
 import {Login} from '../../assets';
 import {Button, Gap, TextInput} from '../../components';
+import {storeData} from '../../utils/LocalStore';
+import {showMessage} from '../../utils';
+import {useDispatch, useSelector} from 'react-redux';
 import styles from './styles';
+import {signInAction} from '../../redux/action';
 
 const LoginScreen = ({navigation}) => {
   const [option, setOption] = useState('driver');
   const [backgroundColor, setBackgroundColor] = useState('#C8D8E2');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const dispatch = useDispatch();
 
   const loginOption = () => {
     if (option === 'driver') {
-      navigation.reset({index: 0, routes: [{name: 'MainApp'}]});
+      dispatch(signInAction(phoneNumber, navigation));
+      // storeData('token', {value: 'token'});
+      // showMessage('Success Login', 'success');
+      // setTimeout(() => {
+      //   navigation.reset({index: 0, routes: [{name: 'MainApp'}]});
+      // }, 2000);
     } else {
       navigation.replace('HomeAdmin');
     }
@@ -45,6 +56,7 @@ const LoginScreen = ({navigation}) => {
                 keyboardType="phone-pad"
                 onBlur={() => setBackgroundColor('#C8D8E2')}
                 onFocus={() => setBackgroundColor('#FFF')}
+                onChangeText={value => setPhoneNumber(value)}
               />
             </View>
           </>

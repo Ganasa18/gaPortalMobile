@@ -22,13 +22,22 @@ import {Button, Gap, ProgressComponent, TextInput} from '../../components';
 import {launchCamera} from 'react-native-image-picker';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 import RNFS from 'react-native-fs';
-import {useDispatch} from 'react-redux';
-import {setLoading} from '../../redux/action';
+import {useDispatch, useSelector} from 'react-redux';
+import {reportSubmit, setLoading} from '../../redux/action';
 
 const Home = ({navigation}) => {
   const [imageCamera, setImageCamera] = useState(null);
   const [modal, setModal] = useState(false);
   const [toast, setToast] = useState(false);
+  const {userReducer, reportReducer} = useSelector(state => state);
+  const [odometer, setOdometer] = useState(null);
+  const [errorImg, setErrorImg] = useState(null);
+  const [errorOdo, setErrorOdo] = useState(null);
+  const [errorPlat, setErrorPlat] = useState(null);
+
+  const platNum = reportReducer.selectedCar;
+  const reportData = reportReducer.reportData;
+  const userData = userReducer.userData;
 
   const dispatch = useDispatch();
 
@@ -42,10 +51,6 @@ const Home = ({navigation}) => {
     } else {
       console.log('File Not Available');
     }
-  };
-
-  const locationSearch = () => {
-    navigation.navigate('LocationScreen');
   };
 
   const carsSearch = () => {
@@ -64,34 +69,70 @@ const Home = ({navigation}) => {
         console.log(res.errorMessage);
       } else {
         const data = res.assets[0];
-        const newFilePath = RNFS.ExternalDirectoryPath + '/MyTest.jpg';
+        // const newFilePath = RNFS.ExternalDirectoryPath + '/MyTest.jpg';
         // console.log(data);
-        const filePath = res.assets[0].uri;
+        // const filePath = res.assets[0].uri;
         setImageCamera(data);
-        RNFS.moveFile(filePath, newFilePath)
-          .then(() => {
-            console.log('IMAGE MOVED', filePath, '-- to --', newFilePath);
-          })
-          .catch(err => {
-            console.log('Error', err);
-          });
+        // RNFS.moveFile(filePath, newFilePath)
+        //   .then(() => {
+        //     console.log('IMAGE MOVED', filePath, '-- to --', newFilePath);
+        //   })
+        //   .catch(err => {
+        //     console.log('Error', err);
+        //   });
       }
     });
   };
 
   const onSubmit = () => {
+    if (!imageCamera || !odometer || !platNum) {
+      if (!imageCamera) {
+        setErrorImg(true);
+      } else {
+        setErrorImg(null);
+      }
+      if (!odometer) {
+        setErrorOdo(true);
+      } else {
+        setErrorOdo(null);
+      }
+      if (!platNum) {
+        setErrorPlat(true);
+      } else {
+        setErrorPlat(null);
+        setErrorOdo(null);
+        setErrorPlat(true);
+      }
+      return;
+    } else {
+      setErrorPlat(null);
+      setErrorOdo(null);
+      setErrorPlat(null);
+    }
+    const data = {
+      img: imageCamera,
+      odometer: odometer,
+      car: platNum,
+      user: userData,
+    };
+    dispatch({type: 'SET_REPORT', value: data});
     setModal(true);
   };
   const submitForm = () => {
     setModal(false);
-    dispatch(setLoading(true));
+    setToast(true);
+
     setTimeout(() => {
-      dispatch(setLoading(false));
-      setToast(true);
-      setTimeout(() => {
-        setToast(false);
-      }, 3000);
-    }, 5000);
+      dispatch(setLoading(true));
+    }, 2000);
+    setTimeout(() => {
+      dispatch(reportSubmit(reportData, navigation));
+    }, 3000);
+
+    // setTimeout(() => {
+    //   setToast(false);
+    //   navigation.replace('SucessSubmit');
+    // }, 3000);
   };
 
   return (
@@ -194,7 +235,12 @@ const Home = ({navigation}) => {
         ) : (
           <>
             <TouchableOpacity activeOpacity={0.7} onPress={openCamera}>
-              <View style={styles.containerCamera}>
+              <View
+                style={
+                  errorImg !== null
+                    ? styles.containerCameraError
+                    : styles.containerCamera
+                }>
                 <IcCamera />
                 <Text style={styles.labelCameraName}>Tap to open camera</Text>
               </View>
@@ -202,6 +248,17 @@ const Home = ({navigation}) => {
           </>
         )}
       </View>
+      {/* Error Validation */}
+      {errorImg && (
+        <>
+          <Gap height={16} />
+          <View style={styles.paddingOnly}>
+            <Text style={styles.errorText}>
+              You must take a picture from camera
+            </Text>
+          </View>
+        </>
+      )}
       {/* <Text>You must take a picture from camera</Text> */}
       <Gap height={16} />
       {/* Input Odometer */}
@@ -211,33 +268,18 @@ const Home = ({navigation}) => {
           placeholder={'Km...'}
           placeholderTextColor="#C2C2C2"
           keyboardType="phone-pad"
+          onChangeText={e => setOdometer(e)}
         />
       </View>
-      <Gap height={16} />
-      {/* Input Location */}
-      <View style={styles.paddingOnly}>
-        <View>
-          <TextInput
-            label={'Location Name *'}
-            placeholder={'PT/SPBU/...'}
-            placeholderTextColor="#C2C2C2"
-            onPressIn={locationSearch}
-            blurOnSubmit={false}
-            icon={
-              <TouchableOpacity activeOpacity={0.7} onPress={locationSearch}>
-                <IcSearch
-                  style={{
-                    position: 'absolute',
-                    right: 10,
-                    top: 0,
-                    padding: 10,
-                  }}
-                />
-              </TouchableOpacity>
-            }
-          />
-        </View>
-      </View>
+      {/* Error Validation */}
+      {errorOdo && (
+        <>
+          <Gap height={16} />
+          <View style={styles.paddingOnly}>
+            <Text style={styles.errorText}>Please fill odometer</Text>
+          </View>
+        </>
+      )}
       <Gap height={16} />
       {/* Input Car */}
       <View style={styles.paddingOnly}>
@@ -245,7 +287,8 @@ const Home = ({navigation}) => {
           label={'Car *'}
           placeholder={'Car'}
           placeholderTextColor="#C2C2C2"
-          onPressIn={carsSearch}
+          onFocus={carsSearch}
+          value={`${platNum ? platNum?.model_vehicle : ''}`}
           icon={
             <TouchableOpacity activeOpacity={0.7} onPress={carsSearch}>
               <IcSearch
@@ -260,6 +303,16 @@ const Home = ({navigation}) => {
           }
         />
       </View>
+      {/* Error Validation */}
+
+      {errorPlat && (
+        <>
+          <Gap height={16} />
+          <View style={styles.paddingOnly}>
+            <Text style={styles.errorText}>Please fill car</Text>
+          </View>
+        </>
+      )}
       <Gap height={16} />
       {/* Input Plat */}
       <View style={styles.paddingOnly}>
@@ -271,7 +324,7 @@ const Home = ({navigation}) => {
             maxLength={2}
             placeholderTextColor="#C2C2C2"
             editable={false}
-            value={''}
+            value={`${platNum ? platNum.value.split(' ')[0] : ''}`}
           />
           <TextInputRN
             style={styles.platTwo}
@@ -279,7 +332,7 @@ const Home = ({navigation}) => {
             placeholderTextColor="#C2C2C2"
             maxLength={6}
             editable={false}
-            value={''}
+            value={`${platNum ? platNum.value.split(' ')[1] : ''}`}
           />
           <TextInputRN
             style={styles.platThree}
@@ -287,7 +340,7 @@ const Home = ({navigation}) => {
             placeholder={'NYC'}
             maxLength={3}
             editable={false}
-            value={''}
+            value={`${platNum ? platNum.value.split(' ')[2] : ''}`}
           />
         </View>
       </View>

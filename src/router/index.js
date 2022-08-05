@@ -3,13 +3,19 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   CarsPage,
+  CategoryScreen,
+  EmergencyScreen,
   Home,
+  Home2,
+  Home3,
   HomeAdminScreen,
   LocationScreen,
   LoginScreen,
   MenuScreen,
+  NotificationScreen,
   ProfileScreen,
   SplashScreen,
+  SuccessScreen,
 } from '../pages';
 import ButtomNavigator from '../components/BottomNavigator';
 
@@ -26,7 +32,7 @@ const MainApp = () => {
       />
       <Tab.Screen
         name="Notifications"
-        component={MenuScreen}
+        component={NotificationScreen}
         options={{headerShown: false}}
       />
       <Tab.Screen
@@ -62,6 +68,21 @@ const Router = () => {
         options={{headerShown: false}}
       />
       <Stack.Screen
+        name="Kilometer2"
+        component={Home2}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Kilometer3"
+        component={Home3}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Category"
+        component={CategoryScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
         name="LocationScreen"
         component={LocationScreen}
         options={{headerShown: false}}
@@ -71,11 +92,17 @@ const Router = () => {
         component={CarsPage}
         options={{headerShown: false}}
       />
-      {/* <Stack.Screen
-        name="ProfileScreen"
-        component={ProfileScreen}
+      <Stack.Screen
+        name="Emergency"
+        component={EmergencyScreen}
         options={{headerShown: false}}
-      /> */}
+      />
+
+      <Stack.Screen
+        name="SucessSubmit"
+        component={SuccessScreen}
+        options={{headerShown: false}}
+      />
 
       {/* Admin Page */}
       <Stack.Screen
